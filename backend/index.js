@@ -1,34 +1,19 @@
 const express = require('express');
-const {Server} = require('socket.io');
+const { Server } = require('socket.io');
+const { setUpSocket } = require('./sockets/socket');
+const { router } = require('./routes/router');
+const cors  = require('cors');
 
 const app = express();
 const io = new Server(3001, {
     cors: true
 });
 
-io.on('connection', (socket) => {
-    console.log('user joined');
-   socket.on('user-joined', ({email, room}) => {
-        socket.join(room);
-        socket.broadcast.to(room).emit('new-user-joined', {socketId: socket.id});
-   }); 
-
-   socket.on('nego-start', ({target, sdp}) => {
-        socket.to(target).emit('nego-offer', {
-            caller: socket.id,
-            sdp: sdp
-        });
-   });
-
-   socket.on('nego-answer', ({target, sdp}) => {
-        socket.to(target).emit('nego-done', {sdp})
-   });
-
-   socket.on('ice-candidate', ({reciever, candidate}) => {
-        socket.to(reciever).emit('ice-request', {candidate});
-   });
-});
+app.use(cors());
+app.use(express.json());
+app.use('/auth', router);
+setUpSocket(io);
 
 app.listen(3000, () => {
     console.log("Server started");
-});
+});  

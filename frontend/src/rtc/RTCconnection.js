@@ -26,7 +26,7 @@ export class RTCConnection{
         }, 3000);
     }
 
-    async addTracks({localStream}) {
+    addTracks({localStream}) {
         const tracks = localStream.getTracks();
         tracks.forEach((track) => {
             this.peer.addTrack(track, localStream);
@@ -36,7 +36,7 @@ export class RTCConnection{
     async handleOffer({caller, sdp, localStream}) {
         const desc = new RTCSessionDescription(sdp);
         await this.peer.setRemoteDescription(desc);
-        await this.addTracks({localStream});
+        this.addTracks({localStream});
         const answer = await this.peer.createAnswer();
         await this.peer.setLocalDescription(answer);
         this.socket.emit('nego-answer', {
@@ -58,6 +58,21 @@ export class RTCConnection{
     
     handleIceRequest({cand}) {
         this.peer.addIceCandidate(cand);
+    }
+
+    closeVideoCall() {
+        if(this.peer){
+            this.peer.ontrack = null;
+            this.peer.onicecandidate = null;
+            this.peer.onnegotiationneeded = null;
+            this.peer.close();
+            this.peer = null;
+        }
+    }
+
+    hangUpCall() {
+        this.closeVideoCall();
+        this.socket.emit('close-call', {socketId: this.socketId});
     }
 
 }
