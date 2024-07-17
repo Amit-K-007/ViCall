@@ -10,6 +10,8 @@ const Room = () => {
     const [localStream, setLocalStream] = useState(null);
     const [remoteStream, setRemoteStream] = useState(null);
     const [peer, setPeer] = useState(null);
+    const [videoBtnColor, setVideoBtnColor] = useState("bg-blue-900 hover:bg-blue-800");
+    const [audioBtnColor, setAudioBtnColor] = useState("bg-blue-900 hover:bg-blue-800");
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -80,25 +82,49 @@ const Room = () => {
         }
     }, [localStream, peer, handleNewUserJoined, handleNegoOffer, handleNegoDone, handleIceCandidate, hangUpCall, socket]);
     
+    const stopVideoStream = useCallback(() => {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack.enabled) {
+            videoTrack.enabled = false; 
+            setVideoBtnColor("bg-red-500 hover:bg-red-600");
+        } else {
+            videoTrack.enabled = true;
+            setVideoBtnColor("bg-blue-900 hover:bg-blue-800");
+        }
+    }, [localStream]);
     
+    const stopAudioStream = useCallback(() => {
+        const audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack.enabled) {
+            audioTrack.enabled = false; // Disable audio track
+            setAudioBtnColor("bg-red-500 hover:bg-red-600");
+        } else {
+            audioTrack.enabled = true;  // Enable audio track
+            setAudioBtnColor("bg-blue-900 hover:bg-blue-800");
+        }
+    }, [localStream]);
+
     return <>
         <div className="bg-indigo-50 min-h-screen p-6 flex flex-col items-center">
             <div className="rounded-lg overflow-hidden border-blue-900 border-2 mb-4">
-            {remoteStream ? <ReactPlayer width={"620px"}  height={"465px"} url={remoteStream} muted playing/> : 
+            {remoteStream ? <ReactPlayer width={"620px"}  height={"465px"} url={remoteStream} playing/> : 
             <></>
             }
             </div>
             <div className="flex items-center justify-center">
                 <button
-                className="bg-blue-900 p-3 text-white rounded-full hover:shadow-lg hover:bg-blue-800"
+                className={`${videoBtnColor} p-3 text-white rounded-full hover:shadow-lg`}
+                onClick={stopVideoStream}
                 >
+                    
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                     <path d="M4.5 4.5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h8.25a3 3 0 0 0 3-3v-9a3 3 0 0 0-3-3H4.5ZM19.94 18.75l-2.69-2.69V7.94l2.69-2.69c.944-.945 2.56-.276 2.56 1.06v11.38c0 1.336-1.616 2.005-2.56 1.06Z" />
                     </svg>
 
                 </button>
                 <button
-                className="bg-blue-900 mx-5 p-3 text-white rounded-full hover:shadow-lg hover:bg-blue-800"
+                className={`${audioBtnColor} mx-5 p-3 text-white rounded-full hover:shadow-lg`}
+                onClick={stopAudioStream}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                     <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
