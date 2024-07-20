@@ -31,9 +31,9 @@ const MyModal = ({closeModal}) => {
     }, [room]);
 
     return <Modal closeModal={closeModal}>
-        <div className="bg-indigo-50 rounded-lg shadow-lg h-full w-full flex justify-center items-center flex-col p-4">
+        <div className="bg-indigo-50 rounded-lg shadow-lg h-full w-full flex justify-center items-center flex-col py-4 px-10 sm:px-4">
             <button
-            className="bg-blue-900 hover:bg-blue-800 h-12 text-white font-semibold w-full sm:w-9/12 py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
+            className="bg-blue-900 hover:bg-blue-800 h-16 text-xl text-white font-semibold w-full sm:w-9/12 py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
             type="button"
             onClick={enterRoom}
             id='newMeetBtn'
@@ -44,9 +44,9 @@ const MyModal = ({closeModal}) => {
                 placeholder="Join video call with code"
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
-                className="w-8/12 rounded-md text-center grow h-12 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                className="w-8/12 rounded-md text-xl text-center grow h-16 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                 ></input>
-                <button className="h-12 w-12 p-2 ml-3 bg-white rounded-md text-blue-900 hover:shadow-md hover:outline"
+                <button className="h-16 w-16 p-2 ml-3 flex items-center justify-center bg-white rounded-md text-blue-900 hover:shadow-md hover:outline"
                 onClick={enterRoom}
                 id='joinBtn'
                 >

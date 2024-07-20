@@ -46,15 +46,15 @@ const Signup = () => {
     return <>
         <div className="bg-indigo-50 p-6 min-h-screen flex items-center justify-center">
             <BackButton />
-            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
-                <h1 className="text-2xl text-blue-900 font-semibold mb-6">Sign Up</h1>
+            <div className="max-w-xl w-full bg-white p-8 rounded-lg shadow-lg">
+                <h1 className="text-4xl text-blue-900 font-semibold mb-10">Sign Up</h1>
                 <form>
-                <div className="mb-4">
-                    <label className="block text-blue-900 text-sm font-bold mb-2" htmlFor="email">
+                <div className="mb-6">
+                    <label className="block text-blue-900 text-xl font-bold mb-4" htmlFor="email">
                     Email
                     </label>
                     <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border text-xl rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="email"
                     type="email"
                     placeholder="Email"
@@ -62,12 +62,12 @@ const Signup = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
-                <div className="mb-4">
-                    <label className="block text-blue-900 text-sm font-bold mb-2" htmlFor="password">
+                <div className="mb-6">
+                    <label className="block text-blue-900 text-xl font-bold mb-4" htmlFor="password">
                     Password
                     </label>
                     <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded text-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="password"
                     type="password"
                     placeholder="Password"
@@ -75,9 +75,9 @@ const Signup = () => {
                     onChange={(e) => setPasword(e.target.value)}
                     />
                 </div>
-                <div className="flex pt-1 items-center justify-between">
+                <div className="flex pt-2 items-center justify-between">
                     <button
-                    className="bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    className="bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 text-xl px-4 rounded focus:outline-none focus:shadow-outline"
                     type="button"
                     onClick={handleSignup}
                     >
@@ -85,7 +85,7 @@ const Signup = () => {
                     </button>
                 </div>
                 <div className="text-center mt-5">
-                    <p className="text-blue-900 text-sm">
+                    <p className="text-blue-900 text-lg">
                     Already have an account?{' '}
                     <a href={signinLink} className="text-blue-500 hover:text-blue-700 font-semibold">
                         Sign In
