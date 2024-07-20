@@ -1,16 +1,62 @@
 const { tokenMiddleware } = require('../middlewares/token');
 
+const liveRooms = new Map();
+
 const setUpSocket = (io) => {
      io.use(tokenMiddleware);
 
+     setInterval(() => {
+          liveRooms.forEach((value, key) => {
+               if(Date.now() - value.created >= 3600000){
+                    liveRooms.delete(key);
+               }
+          })
+     }, 3600000);
+
      io.on('connection',  (socket) => {
           console.log('user joined');
-          socket.on('user-joined', ({email, room}) => {
+          socket.on('user-joined', ({room}) => {
+               if(liveRooms.has(room)){
+                    const currRoom = liveRooms.get(room);
+                    const elapsedTime = Date.now() - currRoom.created;
+                    if(elapsedTime >= 3600000){
+                         io.to(socket.id).emit('inavlid-request');
+                         return;
+                    }
+                    else if(currRoom.isFull < 2){
+                         liveRooms.set(room, {
+                              created: currRoom.created,
+                              isFull: currRoom.isFull + 1
+                         }); 
+                    }
+                    else{
+                         io.to(socket.id).emit('invalid-request');
+                         return;
+                    }
+               }
+               else{
+                    io.to(socket.id).emit('invalid-request');
+                    return;
+               }
+               io.to(socket.id).emit('start-stream');
+               console.log("hi",liveRooms.get(room));
                console.log("user entered room");
                socket.join(room);
                socket.broadcast.to(room).emit('new-user-joined', {socketId: socket.id});
           }); 
-     
+          
+          socket.on('create-room', ({roomId}) => {
+               if(liveRooms.has(roomId)){
+                    io.to(socket.id).emit('inavlid-request');
+               }
+               else{
+                    liveRooms.set(roomId, {
+                         created: Date.now(),
+                         isFull: 0
+                    });
+               }
+          });
+
           socket.on('nego-start', ({target, sdp}) => {
                socket.to(target).emit('nego-offer', {
                     caller: socket.id,
@@ -28,7 +74,11 @@ const setUpSocket = (io) => {
 
           socket.on('close-call', ({socketId}) => {
                socket.to(socketId).emit('close-call', {socketId: socket.id});
-          })
+          });
+
+          socket.on('pause-video', ({socketId}) => {
+               socket.to(socketId).emit("pause-video");
+          });
      });
 }
 

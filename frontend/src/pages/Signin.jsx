@@ -1,13 +1,17 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../providers/Authentication";
 import { toast } from "react-toastify";
+import BackButton from "../components/BackButton";
 
 const Signin = () => {
     const [email, setEmail] = useState("");
     const [password, setPasword] = useState("");
     const { setIsAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const {roomId} = useParams();
+
+    const signupLink = roomId ? `/auth/signup/${roomId}` : "/auth/signup";
 
     const handleSignin = useCallback(async () => {
         const responseJson = await fetch("http://localhost:3000/auth/signin",{
@@ -21,19 +25,27 @@ const Signin = () => {
             }
         });
         if(!responseJson.ok){
-            toast.error("Invalid Credentials");
+            toast.error("Invalid Credentials",{
+                position: "bottom-right"
+            });
         }
         else{
             const response = await responseJson.json();
             localStorage.setItem('email', email);
             localStorage.setItem('token', "Bearer " + response.token);
             setIsAuthenticated(true);
-            navigate('/');
+            if(roomId){
+                navigate(`/room/${roomId}`);
+            }
+            else{
+                navigate('/');
+            }
         }
-    }, [email, password]);
+    }, [email, password, roomId]);
 
     return <>
         <div className="bg-indigo-50 p-6 min-h-screen flex items-center justify-center">
+            <BackButton />
             <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl text-blue-900 font-semibold mb-6">Sign In</h1>
                 <form>
@@ -73,7 +85,7 @@ const Signin = () => {
                 <div className="text-center mt-5">
                     <p className="text-blue-900 text-sm">
                     Don't have an account?{' '}
-                    <a href="/auth/signup" className="text-blue-500 hover:text-blue-700 font-semibold">
+                    <a href={signupLink} className="text-blue-500 hover:text-blue-700 font-semibold">
                         Sign Up
                     </a>
                     </p>

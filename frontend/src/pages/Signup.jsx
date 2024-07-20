@@ -1,13 +1,17 @@
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../providers/Authentication";
+import BackButton from "../components/BackButton";
 
 const Signup = () => {
     const [email, setEmail] = useState("");
     const [password, setPasword] = useState("");
     const { setIsAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const {roomId} = useParams();
+
+    const signinLink = roomId ? `/auth/signin/${roomId}` : "/auth/signin";
 
     const handleSignup = useCallback(async () => {
         const responseJson = await fetch("http://localhost:3000/auth/signup",{
@@ -21,20 +25,27 @@ const Signup = () => {
             }
         });
         if(!responseJson.ok){
-            toast.error("Invalid Credentials");
+            toast.error("Invalid Credentials",{
+                position: "bottom-right"
+            });
         }
         else{
             const response = await responseJson.json();
-            ocalStorage.setItem('email', email);
+            localStorage.setItem('email', email);
             localStorage.setItem('token', "Bearer " + response.token);
             setIsAuthenticated(true);
-            navigate('/');
-
+            if(roomId){
+                navigate(`/room/${roomId}`);
+            }
+            else{
+                navigate('/');
+            }
         }
-    }, [email, password]);
+    }, [email, password, roomId]);
 
     return <>
         <div className="bg-indigo-50 p-6 min-h-screen flex items-center justify-center">
+            <BackButton />
             <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
                 <h1 className="text-2xl text-blue-900 font-semibold mb-6">Sign Up</h1>
                 <form>
@@ -76,7 +87,7 @@ const Signup = () => {
                 <div className="text-center mt-5">
                     <p className="text-blue-900 text-sm">
                     Already have an account?{' '}
-                    <a href="/auth/signin" className="text-blue-500 hover:text-blue-700 font-semibold">
+                    <a href={signinLink} className="text-blue-500 hover:text-blue-700 font-semibold">
                         Sign In
                     </a>
                     </p>

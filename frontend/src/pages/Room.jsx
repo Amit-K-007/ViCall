@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useSocket } from "../providers/Socket";
 import { RTCConnection } from "../rtc/RTCconnection";
 import ReactPlayer from 'react-player';
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../providers/Authentication";
+import boyImg from "../assets/boy.png";
+import ShareButton from "../components/ShareButton";
 
 const Room = () => {
     const socket = useSocket();
@@ -13,16 +15,42 @@ const Room = () => {
     const [videoBtnColor, setVideoBtnColor] = useState("bg-blue-900 hover:bg-blue-800");
     const [audioBtnColor, setAudioBtnColor] = useState("bg-blue-900 hover:bg-blue-800");
     const navigate = useNavigate();
-    
-    useEffect(() => {
-        const setStream = async () => {
-            const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-            setLocalStream(stream);
+    const {isAuthenticated, setIsAuthenticated} = useAuth();
+    const {roomId} = useParams();
+
+    const checkToken = useCallback(async  () => {
+        const token = localStorage.getItem("token");
+        if(token){
+            const response = await fetch("http://localhost:3000/auth",{
+                headers: {
+                    "authorization": token
+                }
+            });
+            if(response.ok){
+                setIsAuthenticated(true);
+            } else {
+                navigate(`/auth/signin/${roomId}`);
+            }
         }
-        setStream();
-        console.log("first",localStream);
+        else{
+            navigate(`/auth/signin/${roomId}`)
+        }
     }, []);
-    
+
+    useEffect(() => {
+        if(socket){
+            if(isAuthenticated){
+                socket.emit('user-joined', {room: roomId});
+            }
+            else{
+                navigate('/invalid_request');
+            }
+        }
+        else{
+            checkToken();
+        }
+    }, [socket, navigate, checkToken]);
+
     const handleNewUserJoined = useCallback(async ({socketId}) => {
         const peer = new RTCConnection({socket, socketId});
         setPeer(peer);
@@ -65,22 +93,51 @@ const Room = () => {
         navigate('/');
     }, [localStream, remoteStream, peer, navigate]);
 
+    const handleVideo = useCallback(() => {
+        setRemoteStream((prevStream) => {
+            if (prevStream) {
+                const newStream = new MediaStream(prevStream.getTracks()); 
+                newStream.getVideoTracks()[0].enabled = !prevStream.getVideoTracks()[0].enabled;
+                return newStream;
+            }
+            return prevStream;
+        });
+    }, []);
+
+    const handleInvalidRequest = useCallback(() => {
+        navigate('/invalid_request');
+    }, []);
+
+    const handleSetStream = useCallback(async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+        console.log("i reached here");
+        setLocalStream(stream);
+    }, []);
+
     useEffect(() => {
         console.log("second",localStream);
-        socket.on('new-user-joined', handleNewUserJoined);
-        socket.on('nego-offer', handleNegoOffer);
-        socket.on('nego-done', handleNegoDone);
-        socket.on('ice-request', handleIceCandidate);
-        socket.on('close-call', hangUpCall);
-        
-        return () => {
-            socket.off('new-user-joined', handleNewUserJoined);
-            socket.off('nego-offer', handleNegoOffer);
-            socket.off('nego-done', handleNegoDone);
-            socket.off('ice-request', handleIceCandidate);
-            socket.off('close-call', hangUpCall);
+        if(socket){
+            socket.on('new-user-joined', handleNewUserJoined);
+            socket.on('nego-offer', handleNegoOffer);
+            socket.on('nego-done', handleNegoDone);
+            socket.on('ice-request', handleIceCandidate);
+            socket.on('close-call', hangUpCall);
+            socket.on('pause-video', handleVideo);
+            socket.on('start-stream', handleSetStream);
+            socket.on('invalid-request', handleInvalidRequest);
+            
+            return () => {
+                socket.off('new-user-joined', handleNewUserJoined);
+                socket.off('nego-offer', handleNegoOffer);
+                socket.off('nego-done', handleNegoDone);
+                socket.off('ice-request', handleIceCandidate);
+                socket.off('close-call', hangUpCall);
+                socket.off('pause-video', handleVideo);
+                socket.off('start-stream', handleSetStream);
+                socket.off('invalid-request', handleInvalidRequest);
+            }
         }
-    }, [localStream, peer, handleNewUserJoined, handleNegoOffer, handleNegoDone, handleIceCandidate, hangUpCall, socket]);
+    }, [handleSetStream, handleInvalidRequest, handleVideo, localStream, peer, handleNewUserJoined, handleNegoOffer, handleNegoDone, handleIceCandidate, hangUpCall, socket]);
     
     const stopVideoStream = useCallback(() => {
         const videoTrack = localStream.getVideoTracks()[0];
@@ -91,29 +148,32 @@ const Room = () => {
             videoTrack.enabled = true;
             setVideoBtnColor("bg-blue-900 hover:bg-blue-800");
         }
-    }, [localStream]);
+        socket.emit('pause-video', {socketId: peer.socketId});
+    }, [localStream, peer, socket]);
     
     const stopAudioStream = useCallback(() => {
         const audioTrack = localStream.getAudioTracks()[0];
         if (audioTrack.enabled) {
-            audioTrack.enabled = false; // Disable audio track
+            audioTrack.enabled = false; 
             setAudioBtnColor("bg-red-500 hover:bg-red-600");
         } else {
-            audioTrack.enabled = true;  // Enable audio track
+            audioTrack.enabled = true;
             setAudioBtnColor("bg-blue-900 hover:bg-blue-800");
         }
     }, [localStream]);
 
     return <>
-        <div className="bg-indigo-50 min-h-screen p-6 flex flex-col items-center">
+        <div className="bg-indigo-50 h-screen p-6 flex flex-col items-center justify-between">
             <div className="rounded-lg overflow-hidden border-blue-900 border-2 mb-4">
-            {remoteStream ? <ReactPlayer width={"620px"}  height={"465px"} url={remoteStream} playing/> : 
-            <></>
+            {remoteStream && remoteStream.getVideoTracks()[0].enabled ? <ReactPlayer width={"620px"}  height={"465px"} url={remoteStream} playing/> : 
+            <>
+                <img src={boyImg} className="h-full"></img>
+            </>
             }
             </div>
             <div className="flex items-center justify-center">
                 <button
-                className={`${videoBtnColor} p-3 text-white rounded-full hover:shadow-lg`}
+                className={`${videoBtnColor} p-3 mr-2 text-white rounded-full hover:shadow-lg`}
                 onClick={stopVideoStream}
                 >
                     
@@ -123,7 +183,7 @@ const Room = () => {
 
                 </button>
                 <button
-                className={`${audioBtnColor} mx-5 p-3 text-white rounded-full hover:shadow-lg`}
+                className={`${audioBtnColor} mx-2 p-3 text-white rounded-full hover:shadow-lg`}
                 onClick={stopAudioStream}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -133,7 +193,7 @@ const Room = () => {
 
                 </button>
                 <button
-                className="bg-red-500 p-3 text-white rounded-full hover:shadow-lg hover:bg-red-600"
+                className="bg-red-500 p-3 mx-2 text-white rounded-full hover:shadow-lg hover:bg-red-600"
                 onClick={hangUpCall}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -141,9 +201,12 @@ const Room = () => {
                     </svg>
 
                 </button>
+                <ShareButton />
             </div>
-            <div className="absolute right-5 bottom-5 rounded-full w-64 h-48 overflow-hidden">
-                <ReactPlayer height={"100%"} width={"100%"} url={localStream} muted playing/>
+            <div className="absolute right-5 bottom-5 rounded-full overflow-hidden">
+                <div className="w-48 h-48 scale-150">
+                    <ReactPlayer height={"100%"} width={"100%"} url={localStream} muted playing/>
+                </div>
             </div>
         </div>
 
