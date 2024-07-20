@@ -10,22 +10,23 @@ export const SocketProvider = ({children}) => {
     const [socket, setSocket] = useState(null);
     const { isAuthenticated } = useAuth();
     useEffect(() => {
-        if (isAuthenticated) {
-          const token = localStorage.getItem('token');
-          const newSocket = io("http://localhost:3001", {
-            auth: {
-              token: token
-            }
-          });
-          setSocket(newSocket);
-          return () => {
-            newSocket.disconnect();
-          };
+        if (isAuthenticated){
+            const token = localStorage.getItem('token');
+            const newSocket = io("http://localhost:3001", {
+                auth: {
+                    token: token
+                }
+            });
+            setSocket(newSocket);
+            return () => {
+                newSocket.disconnect();
+            };
         } 
-        else {
-          setSocket(null);
+        else{
+            setSocket(null);
         }
     }, [isAuthenticated]);
+    
     return <SocketContext.Provider value={socket}>
         {children}
     </SocketContext.Provider>;

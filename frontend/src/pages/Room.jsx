@@ -6,8 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../providers/Authentication";
 import boyImg from "../assets/boy.png";
 import ShareButton from "../components/ShareButton";
-import Draggable from 'react-draggable';
-
+import DraggableStream from "../components/DraggableStream";
 
 const Room = () => {
     const socket = useSocket();
@@ -16,8 +15,8 @@ const Room = () => {
     const [peer, setPeer] = useState(null);
     const [videoBtnColor, setVideoBtnColor] = useState("bg-blue-900 hover:bg-blue-800");
     const [audioBtnColor, setAudioBtnColor] = useState("bg-blue-900 hover:bg-blue-800");
-    const navigate = useNavigate();
     const {isAuthenticated, setIsAuthenticated} = useAuth();
+    const navigate = useNavigate();
     const {roomId} = useParams();
 
     const checkToken = useCallback(async  () => {
@@ -112,12 +111,10 @@ const Room = () => {
 
     const handleSetStream = useCallback(async () => {
         const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-        console.log("i reached here");
         setLocalStream(stream);
     }, []);
 
     useEffect(() => {
-        console.log("second",localStream);
         if(socket){
             socket.on('new-user-joined', handleNewUserJoined);
             socket.on('nego-offer', handleNegoOffer);
@@ -167,60 +164,48 @@ const Room = () => {
     return <>
         <div className="bg-indigo-50 h-screen overflow-hidden p-6 flex flex-col items-center justify-between">
             <div className="rounded-lg border-blue-900 overflow-hidden border-2 flex-grow flex items-center justify-center ">
-            {remoteStream && remoteStream.getVideoTracks()[0].enabled 
-            ? 
-            <div className="w-full h-full bg-black">
-                <ReactPlayer width={"100%"} height={"100%"} url={remoteStream} playing/>
-            </div>
-            : 
-            <>
-                <img src={boyImg} className="h-full object-contain"></img>
-            </>
-            }
+                {remoteStream && remoteStream.getVideoTracks()[0].enabled 
+                ? 
+                <div className="w-full h-full bg-black">
+                    <ReactPlayer width={"100%"} height={"100%"} url={remoteStream} playing/>
+                </div>
+                : 
+                <>
+                    <img src={boyImg} className="h-full object-contain"></img>
+                </>
+                }
             </div>
             <div className="flex items-center justify-center mt-4">
                 <button
-                className={`${videoBtnColor} z-10 p-4 mr-2 text-white rounded-full hover:shadow-lg`}
-                onClick={stopVideoStream}
-                >
-                    
+                    className={`${videoBtnColor} z-10 p-4 mr-2 text-white rounded-full hover:shadow-lg`}
+                    onClick={stopVideoStream}
+                    >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-7">
-                    <path d="M4.5 4.5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h8.25a3 3 0 0 0 3-3v-9a3 3 0 0 0-3-3H4.5ZM19.94 18.75l-2.69-2.69V7.94l2.69-2.69c.944-.945 2.56-.276 2.56 1.06v11.38c0 1.336-1.616 2.005-2.56 1.06Z" />
+                        <path d="M4.5 4.5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h8.25a3 3 0 0 0 3-3v-9a3 3 0 0 0-3-3H4.5ZM19.94 18.75l-2.69-2.69V7.94l2.69-2.69c.944-.945 2.56-.276 2.56 1.06v11.38c0 1.336-1.616 2.005-2.56 1.06Z" />
                     </svg>
-
                 </button>
                 <button
-                className={`${audioBtnColor} z-10 mx-2 p-4 text-white rounded-full hover:shadow-lg`}
-                onClick={stopAudioStream}
-                >
+                    className={`${audioBtnColor} z-10 mx-2 p-4 text-white rounded-full hover:shadow-lg`}
+                    onClick={stopAudioStream}
+                    >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-7">
-                    <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
-                    <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
+                        <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
+                        <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
                     </svg>
-
                 </button>
                 <button
-                className="bg-red-500 z-10 p-4 mx-2 text-white rounded-full hover:shadow-lg hover:bg-red-600"
-                onClick={hangUpCall}
-                >
+                    className="bg-red-500 z-10 p-4 mx-2 text-white rounded-full hover:shadow-lg hover:bg-red-600"
+                    onClick={hangUpCall}
+                    >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-7">
-                    <path fillRule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clipRule="evenodd" />
                     </svg>
-
                 </button>
                 <ShareButton />
             </div>
-            <Draggable
-            bounds="parent">
-                <div className="absolute right-5 bottom-5 rounded-full overflow-hidden">
-                    <div className="w-48 h-48 scale-150 sm:w-60 sm:h-60 sm:scale-150 ">
-                        <ReactPlayer height={"100%"} width={"100%"} url={localStream} muted playing/>
-                    </div>
-                </div>
-            </Draggable>
+            <DraggableStream localStream={localStream} />
         </div>
-
-    </>
+    </>;
 }
 
 export default Room;

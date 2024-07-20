@@ -23,7 +23,7 @@ function App() {
         </Routes>
       </SocketProvider>
     </BrowserRouter>
-  )
+  );
 }
 
 export default App

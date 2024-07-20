@@ -17,7 +17,7 @@ const Modal = ({ closeModal, children }) => {
             </div>
         </>,
         document.querySelector(".portalModelDiv")
-    )
+    );
 }
 
 export default Modal;

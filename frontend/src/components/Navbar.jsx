@@ -10,7 +10,6 @@ const Navbar = () => {
     const handleLogout = useCallback(() => {
         setIsAuthenticated(false);
         localStorage.removeItem('token');
-        localStorage.removeItem('email');
     }, []);
 
     return <>
@@ -19,21 +18,19 @@ const Navbar = () => {
                 <img className="h-20 rounded-full border-solid border-blue-900 border-2" src={logo}></img>
                 <span className="ml-4 font-bold text-blue-900 text-4xl">ViCall</span>
             </div>
-            {
-                isAuthenticated 
-                ?
-                <button 
+            {isAuthenticated 
+            ?
+            <button 
                 className="ring-offset-2 text-lg font-semibold ring-blue-900 hover:shadow-lg hover:ring-blue-700 ring-2 px-5 py-3 rounded-full"
                 onClick={handleLogout}
-                >
-                Log out
-                </button>
-                :
-                <button className="text-xl bg-blue-900 hover:bg-blue-800 hover:shadow-lg h-14 text-white font-semibold px-8 rounded-md focus:outline-none shadow-md focus:shadow-outline"
+                >Log out
+            </button>
+            :
+            <button 
+                className="text-xl bg-blue-900 hover:bg-blue-800 hover:shadow-lg h-14 text-white font-semibold px-8 rounded-md focus:outline-none shadow-md focus:shadow-outline"
                 onClick={() => navigate('/auth/signin')}
-                >
-                Signin / Signup
-                </button>
+                >Signin / Signup
+            </button>
             }
         </div>
     </>

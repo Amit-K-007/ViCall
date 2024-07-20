@@ -1,1 +1,2 @@
-## This is a Video Calling Application
+## ViCall
+It is a Web RTC based Video Calling Application 🎥📞🤙

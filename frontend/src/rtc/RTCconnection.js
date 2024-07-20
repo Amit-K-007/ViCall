@@ -74,5 +74,4 @@ export class RTCConnection{
         this.closeVideoCall();
         this.socket.emit('close-call', {socketId: this.socketId});
     }
-
 }
