@@ -12,7 +12,7 @@ export const SocketProvider = ({children}) => {
     useEffect(() => {
         if (isAuthenticated){
             const token = localStorage.getItem('token');
-            const newSocket = io("http://localhost:3000", {
+            const newSocket = io("https://vicall-backend.onrender.com", {
                 auth: {
                     token: token
                 }
