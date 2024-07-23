@@ -10,7 +10,7 @@ const Homepage = () => {
         const checkToken = async () => {
             const token = localStorage.getItem('token');
             if(token){
-                const response = await fetch("https://vicall-backend.onrender.com/auth",{
+                const response = await fetch("http://localhost:3000/auth",{
                     headers: {
                         "authorization": token
                     }

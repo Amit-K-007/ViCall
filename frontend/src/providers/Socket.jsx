@@ -12,7 +12,7 @@ export const SocketProvider = ({children}) => {
     useEffect(() => {
         if (isAuthenticated){
             const token = localStorage.getItem('token');
-            const newSocket = io("http://localhost:3001", {
+            const newSocket = io("http://localhost:3000", {
                 auth: {
                     token: token
                 }
