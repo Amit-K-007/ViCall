@@ -17,7 +17,7 @@ const Signup = () => {
     const handleSignup = useCallback(async () => {
         const isValid = userSchema.safeParse({email, password});
         if(isValid.success){
-            const responseJson = await fetch("http://localhost:3000/auth/signup",{
+            const responseJson = await fetch("https://vicall-backend.onrender.com/auth/signup",{
                 method: 'POST',
                 body: JSON.stringify({
                     email: email,
