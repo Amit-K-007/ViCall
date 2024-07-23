@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../providers/Authentication";
 import BackButton from "../components/BackButton";
+import userSchema from "../schemas/userSchema";
 
 const Signup = () => {
     const [email, setEmail] = useState("");
@@ -14,23 +15,28 @@ const Signup = () => {
     const signinLink = roomId ? `/auth/signin/${roomId}` : "/auth/signin";
 
     const handleSignup = useCallback(async () => {
-        const responseJson = await fetch("http://localhost:3000/auth/signup",{
-            method: 'POST',
-            body: JSON.stringify({
-                email: email,
-                password: password
-            }),
-            headers: {
-                "Content-type": "application/json"
+        const isValid = userSchema.safeParse({email, password});
+        if(isValid.success){
+            const responseJson = await fetch("http://localhost:3000/auth/signup",{
+                method: 'POST',
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                }),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            const response = await responseJson.json();
+            if(!responseJson.ok){
+                toast.error(response.msg,{
+                    position: "bottom-right"
+                });
+                return;
             }
-        });
-        if(!responseJson.ok){
-            toast.error("Invalid Credentials",{
+            toast.success(response.msg,{
                 position: "bottom-right"
             });
-        }
-        else{
-            const response = await responseJson.json();
             localStorage.setItem('token', "Bearer " + response.token);
             setIsAuthenticated(true);
             if(roomId){
@@ -39,6 +45,15 @@ const Signup = () => {
             else{
                 navigate('/');
             }
+        }
+        else{
+            toast.error(<div>
+                {isValid.error.issues.map((issue) => <div>{
+                    issue.code == "invalid_string" ? "Enter valid email address" : "Enter minimum 8 characters password"
+                }</div>)}
+            </div>, {
+                position: "bottom-right"
+            });
         }
     }, [email, password, roomId]);
 

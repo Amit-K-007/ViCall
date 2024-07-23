@@ -21,7 +21,7 @@ const Navbar = () => {
             {isAuthenticated 
             ?
             <button 
-                className="ring-offset-2 text-lg font-semibold ring-blue-900 hover:shadow-lg hover:ring-blue-700 ring-2 px-5 py-3 rounded-full"
+                className="ring-offset-2 text-lg font-semibold ring-blue-900 hover:shadow-lg hover:ring-blue-700 ring-2 px-5 py-2 rounded-full"
                 onClick={handleLogout}
                 >Log out
             </button>

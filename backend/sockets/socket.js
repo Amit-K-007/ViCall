@@ -4,7 +4,7 @@ const liveRooms = new Map();
 
 const setUpSocket = (io) => {
      io.use(tokenMiddleware);
-
+     
      setInterval(() => {
           liveRooms.forEach((value, key) => {
                if(Date.now() - value.created >= 3600000){
@@ -39,7 +39,6 @@ const setUpSocket = (io) => {
                     return;
                }
                io.to(socket.id).emit('start-stream');
-               console.log("hi",liveRooms.get(room));
                console.log("user entered room");
                socket.join(room);
                socket.broadcast.to(room).emit('new-user-joined', {socketId: socket.id});
