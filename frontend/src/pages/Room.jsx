@@ -75,8 +75,10 @@ const Room = () => {
     }, [localStream, peer]);
 
     const handleIceCandidate = useCallback(({candidate}) => {
-        const cand = new RTCIceCandidate(candidate);
-        peer.handleIceRequest({cand});
+        if(peer){
+            const cand = new RTCIceCandidate(candidate);
+            peer.handleIceRequest({cand});
+        }
     }, [peer]);
     
     const hangUpCall = useCallback(() => {
