@@ -9,6 +9,10 @@ ViCall is a WebRTC-based video calling application designed for seamless, server
 - **JWT Authentication**: Implements JSON Web Tokens (JWT) for secure user authentication and connections.
 - **Responsive Interface**: Designed with a user-friendly and responsive layout for an optimal video calling experience on various devices.
 
+## Try out ViCall
+
+https://vi-call-amits-projects-2d351c5a.vercel.app/
+
 ## Getting Started
 
 To get started with ViCall, follow these steps:
@@ -17,7 +21,7 @@ To get started with ViCall, follow these steps:
 
 - Node.js and npm installed on your machine.
 
-### Installation
+### Installation Locally
 
 1. Clone the repository:
    ```bash
