@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSocket } from "../providers/Socket";
 import { RTCConnection } from "../rtc/RTCconnection";
 import ReactPlayer from 'react-player';
@@ -18,7 +18,6 @@ const Room = () => {
     const {isAuthenticated, setIsAuthenticated} = useAuth();
     const navigate = useNavigate();
     const {roomId} = useParams();
-    const videoRef = useRef(null);
 
     const checkToken = useCallback(async  () => {
         const token = localStorage.getItem("token");
@@ -175,27 +174,14 @@ const Room = () => {
         }
     }, [localStream]);
 
-    useEffect(() => {
-        if (videoRef.current && remoteStream) {
-          videoRef.current.srcObject = remoteStream;
-        }
-      }, [remoteStream]);
-
     return <>
         <div className="bg-indigo-50 h-screen overflow-hidden p-6 flex flex-col items-center justify-between">
             <div className="rounded-lg border-blue-900 overflow-hidden border-2 flex-grow flex items-center justify-center ">
                 {remoteStream && remoteStream.getVideoTracks()[0].enabled 
                 ? 
                 <div className="w-full h-full bg-black">
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        width="100%"
-        height="100%"
-        style={{ objectFit: 'cover' }}
-      />
-    </div>
+                    <ReactPlayer width={"100%"} height={"100%"} url={remoteStream} playing/>
+                </div>
                 : 
                 <>
                     <img src={boyImg} className="h-full object-contain"></img>
