@@ -60,20 +60,22 @@ const Room = () => {
         console.log("handleNewUserJoined ", peer, localStream);
         setPeer(peer);
         peer.addTracks({localStream});
-        peer.peer.ontrack = (event) => {
-            console.log("on track called fro remote stream", event);
-            setRemoteStream(event.streams[0]);
-        };
+        peer.peer.addEventListener("track", async (ev) => {
+            const rStream = ev.streams;
+            console.log("GOT TRACKS!!");
+            setRemoteStream(rStream[0]);
+        });
     }, [localStream]);
     
     const handleNegoOffer = useCallback(async ({caller, sdp}) => {
         const peer = new RTCConnection({socket, socketId: caller});
         console.log("handleNegoOffer ", peer, localStream);
         setPeer(peer);
-        peer.peer.ontrack = (event) => {
-            console.log("on track called fro remote stream", event);
-            setRemoteStream(event.streams[0]);
-        };
+        peer.peer.addEventListener("track", async (ev) => {
+            const rStream = ev.streams;
+            console.log("GOT TRACKS!!");
+            setRemoteStream(rStream[0]);
+        });
         await peer.handleOffer({caller, sdp, localStream});
     }, [localStream]);
     
