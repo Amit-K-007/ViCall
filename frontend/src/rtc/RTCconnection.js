@@ -16,6 +16,7 @@ export class RTCConnection{
         this.peer = new RTCPeerConnection(configuration);
         this.peer.onnegotiationneeded = this.handleNegotiation.bind(this);
         this.peer.onicecandidate = this.handleIceCandidate.bind(this);
+        console.log("rtc class", this.peer);
     }
     
     async handleNegotiation() {

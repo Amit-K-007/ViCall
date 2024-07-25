@@ -17,8 +17,10 @@ const MyModal = ({closeModal}) => {
             const unique9DigitNumber = uniqueValue.slice(-9);
             socket.emit('create-room', {roomId: unique9DigitNumber});
             navigate(`/room/${unique9DigitNumber}`);
+            console.log("myModal ",socket);
         }
         else{
+            console.log("myModal", room);
             if(room == "" || room.length != 9){
                 toast.error("Enter a valid room code",{
                     position: "bottom-right"

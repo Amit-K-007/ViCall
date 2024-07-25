@@ -22,12 +22,14 @@ const Room = () => {
     const checkToken = useCallback(async  () => {
         const token = localStorage.getItem("token");
         if(token){
+            console.log("token chaecking ", token);
             const response = await fetch("https://vicall-backend.onrender.com/auth",{
                 headers: {
                     "authorization": token
                 }
             });
             if(response.ok){
+                console.log("setAuthenticated in checkToken");
                 setIsAuthenticated(true);
             } else {
                 navigate(`/auth/signin/${roomId}`);
@@ -41,6 +43,7 @@ const Room = () => {
     useEffect(() => {
         if(socket){
             if(isAuthenticated){
+                console.log("first effect called user joined", roomId);
                 socket.emit('user-joined', {room: roomId});
             }
             else{
@@ -54,28 +57,34 @@ const Room = () => {
 
     const handleNewUserJoined = useCallback(async ({socketId}) => {
         const peer = new RTCConnection({socket, socketId});
+        console.log("handleNewUserJoined ", peer, localStream);
         setPeer(peer);
         peer.addTracks({localStream});
         peer.peer.ontrack = (event) => {
+            console.log("on track called fro remote stream", event);
             setRemoteStream(event.streams[0]);
         };
     }, [localStream]);
     
     const handleNegoOffer = useCallback(async ({caller, sdp}) => {
         const peer = new RTCConnection({socket, socketId: caller});
+        console.log("handleNegoOffer ", peer, localStream);
         setPeer(peer);
         peer.peer.ontrack = (event) => {
+            console.log("on track called fro remote stream", event);
             setRemoteStream(event.streams[0]);
         };
         await peer.handleOffer({caller, sdp, localStream});
     }, [localStream]);
-
+    
     const handleNegoDone = useCallback(async ({sdp}) => {
+        console.log("nego done", sdp);
         await peer.handleAnswer({sdp});
     }, [localStream, peer]);
-
+    
     const handleIceCandidate = useCallback(({candidate}) => {
         if(peer){
+            console.log("handleIceCandidate", peer);
             const cand = new RTCIceCandidate(candidate);
             peer.handleIceRequest({cand});
         }
@@ -114,9 +123,11 @@ const Room = () => {
     const handleSetStream = useCallback(async () => {
         const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
         setLocalStream(stream);
+        console.log("handleSetStream:",stream);
     }, []);
 
     useEffect(() => {
+        console.log("socket effect ",socket);
         if(socket){
             socket.on('new-user-joined', handleNewUserJoined);
             socket.on('nego-offer', handleNegoOffer);

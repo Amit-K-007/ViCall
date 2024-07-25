@@ -16,7 +16,9 @@ const setUpSocket = (io) => {
      io.on('connection',  (socket) => {
           console.log('user joined');
           socket.on('user-joined', ({room}) => {
+               console.log("socket user-joined ",room);
                if(liveRooms.has(room)){
+                    console.log("socket has room ",room);
                     const currRoom = liveRooms.get(room);
                     const elapsedTime = Date.now() - currRoom.created;
                     if(elapsedTime >= 3600000){
@@ -24,6 +26,7 @@ const setUpSocket = (io) => {
                          return;
                     }
                     else if(currRoom.isFull < 2){
+                         console.log("socket has room < 2",currRoom);
                          liveRooms.set(room, {
                               created: currRoom.created,
                               isFull: currRoom.isFull + 1
@@ -39,16 +42,19 @@ const setUpSocket = (io) => {
                     return;
                }
                io.to(socket.id).emit('start-stream');
-               console.log("user entered room");
                socket.join(room);
                socket.broadcast.to(room).emit('new-user-joined', {socketId: socket.id});
+               console.log("user entered room");
           }); 
           
           socket.on('create-room', ({roomId}) => {
+               console.log("create-room", roomId);
                if(liveRooms.has(roomId)){
+                    console.log("room not created");
                     io.to(socket.id).emit('inavlid-request');
                }
                else{
+                    console.log("room created");
                     liveRooms.set(roomId, {
                          created: Date.now(),
                          isFull: 0
