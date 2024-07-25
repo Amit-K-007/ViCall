@@ -63,6 +63,10 @@ const Room = () => {
         peer.peer.ontrack = (event) => {
             console.log("on track called fro remote stream", event);
             setRemoteStream(event.streams[0]);
+            setTimeout(() => {
+                setRemoteStream(event.streams[0]);
+                console.log("rerendered stream");
+            }, 3000);
         };
     }, [localStream]);
     
@@ -73,6 +77,10 @@ const Room = () => {
         peer.peer.ontrack = (event) => {
             console.log("on track called fro remote stream", event);
             setRemoteStream(event.streams[0]);
+            setTimeout(() => {
+                setRemoteStream(event.streams[0]);
+                console.log("rerendered stream");
+            }, 3000);
         };
         await peer.handleOffer({caller, sdp, localStream});
     }, [localStream]);
