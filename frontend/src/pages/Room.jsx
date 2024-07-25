@@ -177,16 +177,16 @@ const Room = () => {
     return <>
         <div className="bg-indigo-50 h-screen overflow-hidden p-6 flex flex-col items-center justify-between">
             <div className="rounded-lg border-blue-900 overflow-hidden border-2 flex-grow flex items-center justify-center ">
-                {remoteStream && remoteStream.getVideoTracks()[0].enabled 
-                ? 
                 <div className="w-full h-full bg-black">
                     <ReactPlayer width={"100%"} height={"100%"} url={remoteStream} playing/>
                 </div>
+{/*                 {remoteStream && remoteStream.getVideoTracks()[0].enabled 
+                ? 
                 : 
                 <>
                     <img src={boyImg} className="h-full object-contain"></img>
                 </>
-                }
+                } */}
             </div>
             <div className="flex items-center justify-center mt-4">
                 <button
