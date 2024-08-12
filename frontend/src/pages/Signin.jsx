@@ -4,6 +4,7 @@ import { useAuth } from "../providers/Authentication";
 import { toast } from "react-toastify";
 import BackButton from "../components/BackButton";
 import userSchema from "../schemas/userSchema";
+import Loading from "../components/Loading";
 
 const Signin = () => {
     const [email, setEmail] = useState("");
@@ -11,10 +12,12 @@ const Signin = () => {
     const { setIsAuthenticated } = useAuth();
     const navigate = useNavigate();
     const {roomId} = useParams();
+    const [isChecking, setIsChecking] = useState(false);
 
     const signupLink = roomId ? `/auth/signup/${roomId}` : "/auth/signup";
 
     const handleSignin = useCallback(async () => {
+        setIsChecking(true);
         const isValid = userSchema.safeParse({email, password});
         if(isValid.success){
             const responseJson = await fetch("https://vicall-backend.onrender.com/auth/signin",{
@@ -28,6 +31,7 @@ const Signin = () => {
                 }
             });
             const response = await responseJson.json();
+            setIsChecking(false);
             if(!responseJson.ok){
                 toast.error(response.msg,{
                     position: "bottom-right"
@@ -47,6 +51,7 @@ const Signin = () => {
             }
         }
         else{
+            setIsChecking(false);
             toast.error(<div>
                 {isValid.error.issues.map((issue) => <div>{
                     issue.code == "invalid_string" ? "Enter valid email address" : "Enter minimum 8 characters password"
@@ -93,10 +98,16 @@ const Signin = () => {
                 </div>
                 <div className="flex pt-2 items-center justify-between">
                     <button
-                        className="bg-blue-900 hover:bg-blue-800 text-white font-bold text-xl py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className={`bg-blue-900 flex justify-center items-center hover:bg-blue-800 text-white font-bold text-xl py-2 rounded w-28 h-12 focus:outline-none focus:shadow-outline ${
+                        isChecking ? 'pointer-events-none' : ''}`}                   
                         type="button"
                         onClick={handleSignin}
-                        >Sign In
+                        >
+                        {isChecking ? 
+                            <Loading></Loading>
+                        :
+                            "Sign In"
+                        }
                     </button>
                 </div>
                 <div className="text-center mt-5">

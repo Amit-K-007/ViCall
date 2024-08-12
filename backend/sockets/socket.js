@@ -16,9 +16,7 @@ const setUpSocket = (io) => {
      io.on('connection',  (socket) => {
           console.log('user joined');
           socket.on('user-joined', ({room}) => {
-               console.log("socket user-joined ",room);
                if(liveRooms.has(room)){
-                    console.log("socket has room ",room);
                     const currRoom = liveRooms.get(room);
                     const elapsedTime = Date.now() - currRoom.created;
                     if(elapsedTime >= 3600000){
@@ -26,7 +24,6 @@ const setUpSocket = (io) => {
                          return;
                     }
                     else if(currRoom.isFull < 2){
-                         console.log("socket has room < 2",currRoom);
                          liveRooms.set(room, {
                               created: currRoom.created,
                               isFull: currRoom.isFull + 1
