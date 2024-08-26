@@ -11,7 +11,7 @@ ViCall is a WebRTC-based video calling application designed for seamless, server
 
 ## Try out ViCall
 
-https://vi-call-amits-projects-2d351c5a.vercel.app/
+https://vicall-8q79.onrender.com/
 
 ## Getting Started
 
