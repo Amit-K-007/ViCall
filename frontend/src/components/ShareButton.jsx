@@ -22,7 +22,7 @@ const ShareButton = () => {
                 <div className="flex items-center">
                     <span className="w-40">Code: {roomId}</span>
                     <button 
-                        onClick={() => navigator.clipboard.writeText("https://vi-call-amits-projects-2d351c5a.vercel.app/room/" + roomId)}
+                        onClick={() => navigator.clipboard.writeText("https://vicall-8q79.onrender.com/room/" + roomId)}
                         className="text-blue-800 hover:text-blue-500"
                         >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7">
